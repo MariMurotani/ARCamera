@@ -23,7 +23,7 @@
         android:hardwareAccelerated="true"
          >
         <activity
-            android:name="com.example.test.MainActivity"
+            android:name="com.example.main.MainActivity"
             android:label="@string/app_name"
 			android:hardwareAccelerated="true"
 		>
@@ -34,7 +34,7 @@
         </activity>
 
         <receiver
-        android:name="com.example.test.RefReceiver"
+        android:name="com.example.main.RefReceiver"
 		android:exported="true"
 		android:enabled="true">
 			<intent-filter>
@@ -44,10 +44,11 @@
 			<meta-data android:name="jp.tjkapp.adfurikunsdk.PRAD_ID2" android:value="54657d2adb323c0e4900000c"/>
 		</receiver>
 		
-        
+        <!-- 
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
+ -->
+ 
     </application>
 </manifest>
