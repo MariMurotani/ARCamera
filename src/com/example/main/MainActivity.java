@@ -96,9 +96,9 @@ public class MainActivity extends Activity{
 				ll.addView(menupre,lp1);
 			
 		}catch(Exception e){
-			Log.v("murotani",e.getMessage());
+			Log.v("murotani","exception: "+ e.getMessage());
 		}catch(Error e){
-			Log.v("murotani",e.getMessage());
+			Log.v("murotani","error: " + e.getMessage());
 		}
 		/*ll.addView(child,lp3)
 		

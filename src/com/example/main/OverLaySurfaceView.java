@@ -11,11 +11,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuff.Mode;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -41,7 +44,7 @@ public class OverLaySurfaceView extends SurfaceView implements SurfaceHolder.Cal
     //本来リソース管理するもの
     private Bitmap mImage;
     
-    private int iTimerSpan = 1000;	//	タイマー呼び出しタイミング  60fps(Frames Per Second)
+    private int iTimerSpan = 1000;	//	タイマー呼び出しタイミング  60fps(Frames Per Second) 300とかにするとスレッドが遅れるのでsyncroniezdでスキップされる
     
     //	文字列描画用のパラメータ
     private int iPosTextLeft = 10;
@@ -99,32 +102,34 @@ public class OverLaySurfaceView extends SurfaceView implements SurfaceHolder.Cal
 		mLooper = null;
 	}
 	
-	
-	public void doDraw(){
+	//	一部だけ書き換えるロジックを入れたら、描画が前後する AとBの処理実行時間が違うためだと推測
+	public synchronized void doDraw(){
 		//Canvasの取得(マルチスレッド環境対応のためLock)
 	    Canvas canvas = mHolder.lockCanvas();
 	    
-	    //	キャンバスをいったん全てクリア
-	    canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-	    
-	    //	描画する画像の一部分をバッファーする場合にはその領域だけクリアする
-	    /*Paint paintClear = new Paint();
-	    paintClear.setColor(Color.TRANSPARENT);
-	    canvas.drawArc(new Rect(this.mImage.getWidth()), 0, 0false, paint)
-	    */
-	    
-		drawDroidOnCanavs(canvas,(int)this.getWidth() - this.mImage.getWidth());
-	    
-		drawMojisOnCanvas(canvas);
-		
-	    //		3回に一回描画する
-	    /*if(iByougaCounter == 3){
-	    	drawMojisOnCanvas(canvas);
-		    iByougaCounter = 0;
-	    }else{
-	    	iByougaCounter++;
+	    //		A.テキストは4回に一回描画する
+	    if(iByougaCounter % 4 == 0){
+	    //if(false){
+	    	// 	キャンバスをいったん全てクリア
+		    canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+		    drawDroidOnCanavs(canvas,(int)iWidth - this.mImage.getWidth());
+		    drawMojisOnCanvas(canvas);
 	    }
-	    */
+	    //		B.右端のドロイドくんは毎回描画する
+	    else{
+	    	//	    	描画する画像の一部分をバッファーする場合にはその領域だけクリアする
+		    Paint paintClear = new Paint();
+		    //paintClear.setColor(Color.CYAN);
+		    paintClear.setColor(Color.TRANSPARENT);
+		    paintClear.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+		    
+		    //	計算がおかしい気がする float扱えないのか
+		    //int left, int top, int right, int bottom
+		    canvas.drawRect(iWidth-this.mImage.getWidth(),0,iWidth,this.getHeight(), paintClear);
+		    drawDroidOnCanavs(canvas,(int)this.getWidth() - this.mImage.getWidth());
+		    
+	    }
+    	iByougaCounter++;
 	    
 	    //LockしたCanvasを解放、ほかの描画処理スレッドがあればそちらに。
 	    mHolder.unlockCanvasAndPost(canvas);
@@ -146,6 +151,9 @@ public class OverLaySurfaceView extends SurfaceView implements SurfaceHolder.Cal
 	 * @param canvas
 	 */
 	private void drawMojisOnCanvas(Canvas canvas){
+		
+		Log.v("murotani","drawMojisOnCanvas: " + this.iTextCounter);
+		
 		// 縁取り色
 	    Paint paintFuti = getFutiPaint();
 	    // 文字色
@@ -158,7 +166,7 @@ public class OverLaySurfaceView extends SurfaceView implements SurfaceHolder.Cal
 	    
 	    //	文字を描画
 	    for(int i = 0; i < this.strText.length ; i++){
-	    	if(i < this.iTextCounter){
+	    	if(i <= this.iTextCounter){
 	    		canvas.drawText(this.strText[i], this.iPosTextLeft, this.iPosTextTop+(iPosVSpan*i), paintMoji);
 	    	}
 	    }
@@ -243,7 +251,7 @@ public class OverLaySurfaceView extends SurfaceView implements SurfaceHolder.Cal
 	private class myTimerTask extends TimerTask{
 
 		@Override
-		public synchronized void run() {
+		public void run() {
 			// TODO Auto-generated method stub
 			if (mTimer == null) {
 				return;
@@ -254,7 +262,13 @@ public class OverLaySurfaceView extends SurfaceView implements SurfaceHolder.Cal
 			if(iHeight < iPositionTop){
 				iPositionTop = 0;
 			}
-			doDraw();
+			try{
+				doDraw();
+			}catch(Exception e){
+				Log.v("nmurotani","call doDraw: " + e.getMessage());
+			}catch(Error e){
+				Log.v("nmurotani","call doDraw: " + e.getMessage());
+			}
 		}
 	}
 	/**
