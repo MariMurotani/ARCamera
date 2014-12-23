@@ -12,7 +12,10 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Paint.Align;
 import android.graphics.PixelFormat;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuff.Mode;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -38,8 +41,19 @@ public class OverLaySurfaceView extends SurfaceView implements SurfaceHolder.Cal
     //本来リソース管理するもの
     private Bitmap mImage;
     
-    private int iTimerSpan = 100;	//	タイマー呼び出しタイミング  60fps(Frames Per Second)
+    private int iTimerSpan = 1000;	//	タイマー呼び出しタイミング  60fps(Frames Per Second)
     
+    //	文字列描画用のパラメータ
+    private int iPosTextLeft = 10;
+	private int iPosTextTop = 100;
+	private int iPosVSpan = 60;
+	private int iTextCounter = 0;
+	private int iSize = 22;
+	private String[] strText = new String[4];
+	private int iByougaCounter = 0;
+    
+	private int iPhase = 0;
+	
 	public OverLaySurfaceView(Context context) {
 		super(context);
 		this.mContext = context;
@@ -50,6 +64,12 @@ public class OverLaySurfaceView extends SurfaceView implements SurfaceHolder.Cal
 		this.setZOrderOnTop(true);
 		
 		mImage = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_launcher);
+	
+		strText[0] = "Let it go, let it go";
+		strText[1] = "Turn away and slam the door";
+		strText[2] = "I don't care";
+		strText[3] = "what they're going to say";
+			
 	}
 	
 	/**
@@ -79,19 +99,99 @@ public class OverLaySurfaceView extends SurfaceView implements SurfaceHolder.Cal
 		mLooper = null;
 	}
 	
+	
 	public void doDraw(){
-	    //Canvasの取得(マルチスレッド環境対応のためLock)
+		//Canvasの取得(マルチスレッド環境対応のためLock)
 	    Canvas canvas = mHolder.lockCanvas();
-	 
-	    Paint paint = new Paint();
 	    
-	    //描画処理(Lock中なのでなるべく早く)
-	    canvas.drawBitmap(mImage, this.iPositionLeft, this.iPositionTop, paint);
-	 
+	    //	キャンバスをいったん全てクリア
+	    canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+	    
+	    //	描画する画像の一部分をバッファーする場合にはその領域だけクリアする
+	    /*Paint paintClear = new Paint();
+	    paintClear.setColor(Color.TRANSPARENT);
+	    canvas.drawArc(new Rect(this.mImage.getWidth()), 0, 0false, paint)
+	    */
+	    
+		drawDroidOnCanavs(canvas,(int)this.getWidth() - this.mImage.getWidth());
+	    
+		drawMojisOnCanvas(canvas);
+		
+	    //		3回に一回描画する
+	    /*if(iByougaCounter == 3){
+	    	drawMojisOnCanvas(canvas);
+		    iByougaCounter = 0;
+	    }else{
+	    	iByougaCounter++;
+	    }
+	    */
+	    
 	    //LockしたCanvasを解放、ほかの描画処理スレッドがあればそちらに。
 	    mHolder.unlockCanvasAndPost(canvas);
+	    
+	}
+	   
+	/**
+	 * droidをキャンバスに描く
+	 * @param canvas
+	 */
+	private void drawDroidOnCanavs(Canvas canvas,int left){
+		 //　droidくんを描画
+		 Paint paint = new Paint();
+		 canvas.drawBitmap(mImage, left, this.iPositionTop, paint);
 	}
 	
+	/**
+	 * 文字列をキャンバスに描画する
+	 * @param canvas
+	 */
+	private void drawMojisOnCanvas(Canvas canvas){
+		// 縁取り色
+	    Paint paintFuti = getFutiPaint();
+	    // 文字色
+	    Paint paintMoji = getMojiPaint();
+	    
+	    //	縁取り色を先に描画
+	    for(int i = 0; i < this.strText.length ; i++){
+	    	canvas.drawText(this.strText[i], this.iPosTextLeft, this.iPosTextTop+(iPosVSpan*i), paintFuti);
+	    }
+	    
+	    //	文字を描画
+	    for(int i = 0; i < this.strText.length ; i++){
+	    	if(i < this.iTextCounter){
+	    		canvas.drawText(this.strText[i], this.iPosTextLeft, this.iPosTextTop+(iPosVSpan*i), paintMoji);
+	    	}
+	    }
+	    
+	    //	 行数カウンタをリセット
+	    this.iTextCounter++;
+	    if(this.strText.length < this.iTextCounter){
+	    	this.iTextCounter = 0;
+	    }
+	    
+	}
+	private Paint getFutiPaint(){
+		Paint paint = new Paint();
+	    paint.setAntiAlias(true);                    // アンチエイリアス
+	    paint.setStrokeWidth(5.0f);                // 描画の幅
+	    paint.setColor(Color.WHITE);             // 縁取り色のセット
+	    paint.setAlpha(0x77);                        // アルファ値をセット
+	    paint.setTextSize(this.iSize);           // テキストサイズ
+	    paint.setTextAlign(Align.LEFT);          // 左寄せ
+	    paint.setStyle(Paint.Style.STROKE);
+	    return paint;
+	}
+	private Paint getMojiPaint(){
+		Paint paint = new Paint();
+	    paint.setAntiAlias(true);
+	    paint.setStrokeWidth(0);
+	    paint.setColor(Color.BLACK);
+	    paint.setTextSize(this.iSize);
+	    paint.setTextAlign(Align.LEFT);
+	    paint.setStyle(Paint.Style.FILL);
+	    return paint;
+
+	}
 	/**
 	 * ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ SurfaceHolder.Callback ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ 
 	 * */
@@ -143,7 +243,7 @@ public class OverLaySurfaceView extends SurfaceView implements SurfaceHolder.Cal
 	private class myTimerTask extends TimerTask{
 
 		@Override
-		public void run() {
+		public synchronized void run() {
 			// TODO Auto-generated method stub
 			if (mTimer == null) {
 				return;

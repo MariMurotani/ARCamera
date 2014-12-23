@@ -51,7 +51,8 @@ public class MainActivity extends Activity{
 		Display dp = wm.getDefaultDisplay();
 		
 		setContentView(R.layout.activity_main3);
-		android.view.ViewGroup.LayoutParams lp1 = new LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT,dp.getHeight()/2);
+		android.view.ViewGroup.LayoutParams lp1 = new LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT,dp.getHeight()/3);
+		android.view.ViewGroup.LayoutParams lp2 = new LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT,dp.getHeight()/3*2);
 		android.view.ViewGroup.LayoutParams lp3 = new LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT,android.view.ViewGroup.LayoutParams.MATCH_PARENT);
 		
 		fl = (FrameLayout)findViewById(R.id.layout3);
@@ -71,13 +72,28 @@ public class MainActivity extends Activity{
 				Log.v("murotani",String.valueOf(this.ll.getBaseline()));
 				
 				//	カメラーのプレビュー
-				cp1 = new CameraPreview(mContext,getCamDegree());
+				cp1 = new CameraPreview(mContext,getCamDegree()+90);
 				
 				ll.addView(cp1,lp1);
 				
 				//	オーバーレイのプレビュー
 				OverLaySurfaceView over = new OverLaySurfaceView(mContext);
-				fl.addView(over,lp3);
+				fl.addView(over,lp2);
+				
+				//	メニューのプレビュー
+				/*SimpleMediaPreview mp2 = new SimpleMediaPreview(mContext);
+				mp2.setPath("https://s3-ap-northeast-1.amazonaws.com/mysettingfiles/frozen.mp4");
+				ll.addView(mp2,lp1);
+				*/
+				MenuContainer menupre = new MenuContainer(mContext);
+				menupre.mOnClickListner = new MenuContainer.onClickListener() {
+					@Override
+					public void onClose() {
+						// TODO Auto-generated method stub
+						System.exit(RESULT_OK);
+					}
+				};
+				ll.addView(menupre,lp1);
 			
 		}catch(Exception e){
 			Log.v("murotani",e.getMessage());
@@ -111,9 +127,15 @@ public class MainActivity extends Activity{
 		if(keyCode != KeyEvent.KEYCODE_BACK){
 			return super.onKeyDown(keyCode, event);
 		}else{
-			this.finishActivity(1);
+			try{
+				this.finishActivity(1);
+				super.onDestroy();
+			}catch(Exception e){
+				Log.v("murotani",e.getMessage());
+			}
 			return false;
 		}
+		
 	}
 
 	private int getCamDegree(){
