@@ -80,6 +80,9 @@ public class MainActivity extends Activity{
 				OverLaySurfaceView over = new OverLaySurfaceView(mContext);
 				fl.addView(over,lp2);
 				
+				OverLaySurfaceViewGL over2 = new OverLaySurfaceViewGL(mContext);
+				fl.addView(over2,lp2);
+				
 				//	メニューのプレビュー
 				/*SimpleMediaPreview mp2 = new SimpleMediaPreview(mContext);
 				mp2.setPath("https://s3-ap-northeast-1.amazonaws.com/mysettingfiles/frozen.mp4");

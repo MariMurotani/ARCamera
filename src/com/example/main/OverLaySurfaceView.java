@@ -1,6 +1,5 @@
 package com.example.main;
 
-import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -11,15 +10,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.opengl.GLSurfaceView;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -44,7 +39,7 @@ public class OverLaySurfaceView extends SurfaceView implements SurfaceHolder.Cal
     //本来リソース管理するもの
     private Bitmap mImage;
     
-    private int iTimerSpan = 1000;	//	タイマー呼び出しタイミング  60fps(Frames Per Second) 300とかにするとスレッドが遅れるのでsyncroniezdでスキップされる
+    private int iTimerSpan = 4000;	//	タイマー呼び出しタイミング  60fps(Frames Per Second) 300とかにするとスレッドが遅れるのでsyncroniezdでスキップされる
     
     //	文字列描画用のパラメータ
     private int iPosTextLeft = 10;
@@ -72,7 +67,6 @@ public class OverLaySurfaceView extends SurfaceView implements SurfaceHolder.Cal
 		strText[1] = "Turn away and slam the door";
 		strText[2] = "I don't care";
 		strText[3] = "what they're going to say";
-			
 	}
 	
 	/**
@@ -103,16 +97,16 @@ public class OverLaySurfaceView extends SurfaceView implements SurfaceHolder.Cal
 	}
 	
 	//	一部だけ書き換えるロジックを入れたら、描画が前後する AとBの処理実行時間が違うためだと推測
-	public synchronized void doDraw(){
+	public synchronized void doDraw() {
 		//Canvasの取得(マルチスレッド環境対応のためLock)
 	    Canvas canvas = mHolder.lockCanvas();
 	    
 	    //		A.テキストは4回に一回描画する
-	    if(iByougaCounter % 4 == 0){
-	    //if(false){
+	    //if(iByougaCounter % 4 == 0){
+	    if(true){
 	    	// 	キャンバスをいったん全てクリア
 		    canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-		    drawDroidOnCanavs(canvas,(int)iWidth - this.mImage.getWidth());
+		    //drawDroidOnCanavs(canvas,(int)iWidth - this.mImage.getWidth());
 		    drawMojisOnCanvas(canvas);
 	    }
 	    //		B.右端のドロイドくんは毎回描画する
@@ -178,6 +172,7 @@ public class OverLaySurfaceView extends SurfaceView implements SurfaceHolder.Cal
 	    }
 	    
 	}
+	
 	private Paint getFutiPaint(){
 		Paint paint = new Paint();
 	    paint.setAntiAlias(true);                    // アンチエイリアス
@@ -189,6 +184,7 @@ public class OverLaySurfaceView extends SurfaceView implements SurfaceHolder.Cal
 	    paint.setStyle(Paint.Style.STROKE);
 	    return paint;
 	}
+	
 	private Paint getMojiPaint(){
 		Paint paint = new Paint();
 	    paint.setAntiAlias(true);
@@ -271,6 +267,7 @@ public class OverLaySurfaceView extends SurfaceView implements SurfaceHolder.Cal
 			}
 		}
 	}
+	
 	/**
 	 * ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ TimerTask ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ 
 	 * */
