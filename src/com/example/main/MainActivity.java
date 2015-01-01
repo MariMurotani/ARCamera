@@ -60,14 +60,14 @@ public class MainActivity extends Activity{
 		try{
 				this.ll = new LinearLayout(mContext);
 				this.ll.setOrientation(LinearLayout.VERTICAL);
-				//this.rl = new RalitiveLayout(mContext);
+		 	    //this.rl = new RalitiveLayout(mContext);
 				
 				fl.addView(this.ll ,lp3);
 				
 				//	動画のプレビュー	
 				mp1 = new SimpleMediaPreview(mContext);
 				mp1.setPath("https://s3-ap-northeast-1.amazonaws.com/mysettingfiles/frozen.mp4");
-				ll.addView(mp1,lp1);
+				//ll.addView(mp1,lp1);
 				
 				Log.v("murotani",String.valueOf(this.ll.getBaseline()));
 				
@@ -80,8 +80,10 @@ public class MainActivity extends Activity{
 				OverLaySurfaceView over = new OverLaySurfaceView(mContext);
 				fl.addView(over,lp2);
 				
+				//	オーバーレイのプレビュー GL版
 				OverLaySurfaceViewGL over2 = new OverLaySurfaceViewGL(mContext);
-				fl.addView(over2,lp2);
+				over2.bringToFront();
+				fl.addView(over2,lp3);
 				
 				//	メニューのプレビュー
 				/*SimpleMediaPreview mp2 = new SimpleMediaPreview(mContext);
