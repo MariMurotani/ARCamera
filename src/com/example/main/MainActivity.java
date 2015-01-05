@@ -80,6 +80,10 @@ public class MainActivity extends Activity{
 				OverLaySurfaceView over = new OverLaySurfaceView(mContext);
 				fl.addView(over,lp2);
 				
+				//	オーバーレイのプレビュー image
+				OverLaySurfaceViewImage over2 = new OverLaySurfaceViewImage(mContext);
+				fl.addView(over2,lp2);
+				
 				//	オーバーレイのプレビュー GL版 => NG
 				/*OverLaySurfaceViewGL over2 = new OverLaySurfaceViewGL(mContext);
 				over2.bringToFront();
@@ -96,6 +100,18 @@ public class MainActivity extends Activity{
 					public void onClose() {
 						// TODO Auto-generated method stub
 						System.exit(RESULT_OK);
+					}
+
+					@Override
+					public void onGotoGLActivity() {
+						// TODO Auto-generated method stub
+						Intent i = new Intent(getApplicationContext(),GLActivity.class);
+						startActivity(i);
+					}
+
+					@Override
+					public void onGotoMainActivity() {
+						finish();
 					}
 				};
 				ll.addView(menupre,lp1);

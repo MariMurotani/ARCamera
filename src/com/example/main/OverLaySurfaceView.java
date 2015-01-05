@@ -39,7 +39,7 @@ public class OverLaySurfaceView extends SurfaceView implements SurfaceHolder.Cal
     //本来リソース管理するもの
     private Bitmap mImage;
     
-    private int iTimerSpan = 2000;	//	タイマー呼び出しタイミング  60fps(Frames Per Second) 300とかにするとスレッドが遅れるのでsyncroniezdでスキップされる
+    private int iTimerSpan = 1000;	//	タイマー呼び出しタイミング  60fps(Frames Per Second) 300とかにするとスレッドが遅れるのでsyncroniezdでスキップされる
     
     //	文字列描画用のパラメータ
     private int iPosTextLeft = 10;

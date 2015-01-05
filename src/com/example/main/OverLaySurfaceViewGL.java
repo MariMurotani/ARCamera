@@ -63,12 +63,24 @@ public class OverLaySurfaceViewGL extends GLSurfaceView implements Renderer{
         "}                                          ";
      
     // 三角形の頂点座標
-    private float[] vertices = new float[] {
+    /*private float[] vertices = new float[] {
         0.0f, 0.8f, 0.0f,
         0.8f, -0.8f, 0.0f,
         -0.8f, -0.8f, 0.0f,
+    };*/
+    // 三角形の頂点座標
+    private float[] vertices = new float[] {
+    		// X, Y, Z,
+            // R, G, B, A
+            -0.5f, -0.25f, 0.0f,
+            1.0f, 0.0f, 0.0f, 1.0f,
+ 
+            0.5f, -0.25f, 0.0f,
+            0.0f, 0.0f, 1.0f, 1.0f,
+ 
+            0.0f, 0.559016994f, 0.0f,
+            0.0f, 1.0f, 0.0f, 1.0f
     };
-
 	//2次元スプライト
     SampleSprite droid_img = new SampleSprite();
  
@@ -94,23 +106,7 @@ public class OverLaySurfaceViewGL extends GLSurfaceView implements Renderer{
 	 * ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ Renderer ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 
 	 * */
     public void onSurfaceCreated(GL10 gl,javax.microedition.khronos.egl.EGLConfig config){
-    	try{/*
-	        //背景色をクリア
-	        gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	        //ディザを無効化
-	        gl.glDisable(GL10.GL_DITHER);
-	        //深度テストを有効化
-	        gl.glEnable(GL10.GL_DEPTH_TEST);
-	        //テクスチャ機能ON
-	        gl.glEnable(GL10.GL_TEXTURE_2D);
-	        //透明可能に
-	        gl.glEnable(GL10.GL_ALPHA_TEST);
-	        //ブレンド可能に
-	        gl.glEnable(GL10.GL_BLEND);
-	        gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-	        
-	        droid_img.setTexture(gl,this.mContext.getResources(),R.drawable.ic_launcher);
-	        */
+    	try{
     		// プログラムオブジェクトを作成
             program = createProgram(vertexShaderSrc, fragmentShaderSrc);
              
@@ -121,9 +117,13 @@ public class OverLaySurfaceViewGL extends GLSurfaceView implements Renderer{
             ByteBuffer buffer = ByteBuffer.allocateDirect(vertices.length * 4);
             vertexBuffer = buffer.order(ByteOrder.nativeOrder()).asFloatBuffer();
             vertexBuffer.put(vertices).position(0);
-             
+            
             // 背景色を設定
             GLES20.glClearColor(0.6f, 0.7f, 0.8f, 1.0f);
+            
+            //	カメラの位置を設定
+            gl.glTranslatef(0, 0, -2.0f);
+            
     	}catch(Exception e){
     		Log.v(Const.logTag,"onSurfaceCreated" + e.getMessage());
     	}catch(Error e){
@@ -134,10 +134,7 @@ public class OverLaySurfaceViewGL extends GLSurfaceView implements Renderer{
     public void onDrawFrame(GL10 gl) {
     	// 描画用バッファをクリア
     	try{
-	        //gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-	        //droid_img.draw(gl);
-	        
-    		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+	        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
             GLES20.glUseProgram(program);
              
             GLES20.glVertexAttribPointer(aPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, vertexBuffer);
@@ -213,11 +210,7 @@ public class OverLaySurfaceViewGL extends GLSurfaceView implements Renderer{
     }
     public void onSurfaceChanged(GL10 gl, int width, int height) {
     	try{
-			/*gl.glViewport(0, 0, width, height);
-			gl.glMatrixMode(GL10.GL_PROJECTION);//プロジェクションモードに設定
-			GLU.gluOrtho2D(gl, 0.0f, width, 0.0f, height);//平行投影用のパラメータをセット
-			*/
-    		GLES20.glViewport(0, 0, width, height);
+			GLES20.glViewport(0, 0, width, height);
 		}catch(Exception e){
 			Log.v(Const.logTag,"onSurfaceCreated" + e.getMessage());
 		}catch(Error e){

@@ -78,6 +78,17 @@ public class GLActivity extends Activity{
 						// TODO Auto-generated method stub
 						System.exit(RESULT_OK);
 					}
+					@Override
+					public void onGotoGLActivity() {
+						// TODO Auto-generated method stub
+						Intent i = new Intent(getApplicationContext(),GLActivity.class);
+						startActivity(i);
+					}
+					@Override
+					public void onGotoMainActivity() {
+						// TODO Auto-generated method stub
+						finish();
+					}
 				};
 				ll.addView(menupre,lp4);
 				this.addContentView(ll,lp3);
