@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Parameters;
@@ -59,6 +60,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         this.mHolder = getHolder();
         this.mHolder.addCallback(this);
         this.mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        this.mHolder.setFormat( PixelFormat.TRANSLUCENT );
         
         PREVIEW_WIDTH = 480;
         PREVIEW_HEIGHT = 800;
